@@ -86,14 +86,23 @@ class ExcelTemplateGenerator:
         ws_summary['A17'] = "Current Price:"
         ws_summary['B17'] = current_price
         
-        ws_summary['A19'] = "Valuation Analysis"
-        ws_summary['A19'].font = self.header_font
-        ws_summary['A19'].fill = self.header_fill
-        ws_summary.merge_cells('A19:F19')
+        ws_summary['A18'] = "Growth Assumptions"
+        ws_summary['A18'].font = self.header_font
+        ws_summary['A18'].fill = self.header_fill
+        ws_summary.merge_cells('A18:B18')
         
-        headers = ['Scenario', 'EV/EBITDA Multiple', 'Target EV', 'Target Equity Value', 'Target Price', 'Upside/Downside']
+        ws_summary['A19'] = "EBITDA Growth Rate (Annual):"
+        ws_summary['B19'] = 0.08
+        ws_summary['B19'].number_format = '0.0%'
+        
+        ws_summary['A21'] = "5-Year Exit Valuation Analysis"
+        ws_summary['A21'].font = self.header_font
+        ws_summary['A21'].fill = self.header_fill
+        ws_summary.merge_cells('A21:G21')
+        
+        headers = ['Scenario', 'Exit Multiple', 'Year 5 EBITDA', 'Exit EV', 'Exit Equity Value', 'Exit Price', 'Total Return']
         for i, header in enumerate(headers, 1):
-            cell = ws_summary.cell(row=20, column=i, value=header)
+            cell = ws_summary.cell(row=22, column=i, value=header)
             cell.font = self.header_font
             cell.fill = self.header_fill
             cell.border = self.border
@@ -107,26 +116,27 @@ class ExcelTemplateGenerator:
             ('Test Scenario', 19.5)
         ]
         
-        for i, (scenario, multiple) in enumerate(scenarios, 21):
+        for i, (scenario, multiple) in enumerate(scenarios, 23):
             ws_summary.cell(row=i, column=1, value=scenario)
             ws_summary.cell(row=i, column=2, value=multiple)
             
-            ws_summary.cell(row=i, column=3, value=f'=$B$14*B{i}')
-            ws_summary.cell(row=i, column=4, value=f'=C{i}-$B$15')
-            ws_summary.cell(row=i, column=5, value=f'=D{i}/$B$16')
-            ws_summary.cell(row=i, column=6, value=f'=(E{i}-$B$17)/$B$17')
-            ws_summary.cell(row=i, column=6).number_format = '0.0%'
+            ws_summary.cell(row=i, column=3, value=f'=$B$14*(1+$B$19)^5')
+            ws_summary.cell(row=i, column=4, value=f'=C{i}*B{i}')
+            ws_summary.cell(row=i, column=5, value=f'=D{i}-$B$15')
+            ws_summary.cell(row=i, column=6, value=f'=E{i}/$B$16')
+            ws_summary.cell(row=i, column=7, value=f'=(F{i}/$B$17)^(1/5)-1')
+            ws_summary.cell(row=i, column=7).number_format = '0.0%'
         
         ws_sensitivity = wb.create_sheet("Sensitivity Analysis")
         
-        ws_sensitivity['A1'] = "EV/EBITDA Sensitivity Analysis"
+        ws_sensitivity['A1'] = "5-Year Exit EV/EBITDA Sensitivity Analysis"
         ws_sensitivity['A1'].font = Font(size=14, bold=True)
         ws_sensitivity.merge_cells('A1:K1')
         
         multiples = [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
-        ebitda_growth_rates = [-10, -5, 0, 5, 10, 15, 20]
+        ebitda_growth_rates = [2, 4, 6, 8, 10, 12, 15]
         
-        ws_sensitivity['A3'] = "EBITDA Growth %"
+        ws_sensitivity['A3'] = "EBITDA Growth % (Annual)"
         for i, multiple in enumerate(multiples, 2):
             ws_sensitivity.cell(row=2, column=i, value=f"{multiple}x")
             ws_sensitivity.cell(row=2, column=i).font = self.header_font
@@ -140,9 +150,9 @@ class ExcelTemplateGenerator:
             for j, multiple in enumerate(multiples, 2):
                 col_letter = chr(ord('A') + j)
                 growth_decimal = growth / 100
-                formula = f'=(Summary.$B$14*(1+{growth_decimal})*{multiple}-Summary.$B$15)/Summary.$B$16'
+                formula = f'=((Summary.$B$14*(1+{growth_decimal})^5*{multiple}-Summary.$B$15)/Summary.$B$16/Summary.$B$17)^(1/5)-1'
                 ws_sensitivity.cell(row=i, column=j, value=formula)
-                ws_sensitivity.cell(row=i, column=j).number_format = '$0.00'
+                ws_sensitivity.cell(row=i, column=j).number_format = '0.0%'
         
         sensitivity_range = f"B3:L{2+len(ebitda_growth_rates)}"
         rule = ColorScaleRule(start_type='min', start_color='FF6B6B',
@@ -222,6 +232,15 @@ class ExcelTemplateGenerator:
         ws['A7'] = "Current Price:"
         ws['B7'] = current_price
         
+        ws['A9'] = "Growth Assumptions"
+        ws['A9'].font = self.header_font
+        ws['A9'].fill = self.header_fill
+        ws.merge_cells('A9:B9')
+        
+        ws['A10'] = "Revenue Growth Rate (Annual):"
+        ws['B10'] = 0.10
+        ws['B10'].number_format = '0.0%'
+        
         scenarios = [
             ('Conservative', 2.0),
             ('Market Average', 3.5),
@@ -230,26 +249,27 @@ class ExcelTemplateGenerator:
             ('Target Multiple', 4.2)
         ]
         
-        ws['A9'] = "Valuation Analysis"
-        ws['A9'].font = self.header_font
-        ws['A9'].fill = self.header_fill
-        ws.merge_cells('A9:F9')
+        ws['A12'] = "5-Year Exit Valuation Analysis"
+        ws['A12'].font = self.header_font
+        ws['A12'].fill = self.header_fill
+        ws.merge_cells('A12:G12')
         
-        headers = ['Scenario', 'EV/Sales Multiple', 'Target EV', 'Target Equity Value', 'Target Price', 'Upside/Downside']
+        headers = ['Scenario', 'Exit Multiple', 'Year 5 Revenue', 'Exit EV', 'Exit Equity Value', 'Exit Price', 'Total Return']
         for i, header in enumerate(headers, 1):
-            cell = ws.cell(row=10, column=i, value=header)
+            cell = ws.cell(row=13, column=i, value=header)
             cell.font = self.header_font
             cell.fill = self.header_fill
         
-        for i, (scenario, multiple) in enumerate(scenarios, 11):
+        for i, (scenario, multiple) in enumerate(scenarios, 14):
             ws.cell(row=i, column=1, value=scenario)
             ws.cell(row=i, column=2, value=multiple)
             
-            ws.cell(row=i, column=3, value=f'=$B$4*B{i}')
-            ws.cell(row=i, column=4, value=f'=C{i}-$B$5')
-            ws.cell(row=i, column=5, value=f'=D{i}/$B$6')
-            ws.cell(row=i, column=6, value=f'=(E{i}-$B$7)/$B$7')
-            ws.cell(row=i, column=6).number_format = '0.0%'
+            ws.cell(row=i, column=3, value=f'=$B$4*(1+$B$10)^5')
+            ws.cell(row=i, column=4, value=f'=C{i}*B{i}')
+            ws.cell(row=i, column=5, value=f'=D{i}-$B$5')
+            ws.cell(row=i, column=6, value=f'=E{i}/$B$6')
+            ws.cell(row=i, column=7, value=f'=(F{i}/$B$7)^(1/5)-1')
+            ws.cell(row=i, column=7).number_format = '0.0%'
         
         wb.save(output_path)
         print(f"EV/Sales template saved to {output_path}")
@@ -297,7 +317,11 @@ class ExcelTemplateGenerator:
         base_revenue = 0
         if income_statement:
             latest = income_statement[0]
-            base_revenue = latest.get('revenue', 0) or latest.get('totalRevenue', 0)
+            revenue_keys = ['Total Revenue', 'revenue', 'totalRevenue', 'Net Sales', 'Sales']
+            for key in revenue_keys:
+                if key in latest and latest[key] is not None:
+                    base_revenue = latest[key]
+                    break
         
         ws_dcf['A13'] = "Revenue"
         ws_dcf['B13'] = base_revenue
@@ -335,13 +359,13 @@ class ExcelTemplateGenerator:
         ws_dcf['A22'].fill = self.header_fill
         
         ws_dcf['A23'] = "Terminal Value"
-        ws_dcf['B23'] = '=H20/($B$5-$B$6)'
+        ws_dcf['B23'] = '=H20/($B$5-$B$7)'
         
         ws_dcf['A24'] = "PV of Terminal Value"
-        ws_dcf['B24'] = '=B23/((1+$B$6)^5)'
+        ws_dcf['B24'] = '=B23/((1+$B$7)^5)'
         
         ws_dcf['A25'] = "Sum of PV of FCF (Years 1-5)"
-        ws_dcf['B25'] = '=NPV($B$6,C20:G20)'  # NPV of explicit forecast period
+        ws_dcf['B25'] = '=NPV($B$7,C20:G20)'  # NPV of explicit forecast period
         
         ws_dcf['A26'] = "Enterprise Value"
         ws_dcf['B26'] = '=B24+B25'
@@ -387,6 +411,19 @@ class ExcelTemplateGenerator:
             ws_sensitivity.cell(row=i, column=1, value=f"{terminal}%")
             ws_sensitivity.cell(row=i, column=1).font = self.header_font
             ws_sensitivity.cell(row=i, column=1).fill = self.header_fill
+            
+            for j, wacc in enumerate(wacc_rates, 2):
+                terminal_decimal = terminal / 100
+                wacc_decimal = wacc / 100
+                formula = f'=((DCF Model.H20/{terminal_decimal}-{wacc_decimal})/((1+{wacc_decimal})^5)+NPV({wacc_decimal},DCF Model.C20:G20)-DCF Model.B27)/DCF Model.B29'
+                ws_sensitivity.cell(row=i, column=j, value=formula)
+                ws_sensitivity.cell(row=i, column=j).number_format = '$0.00'
+        
+        sensitivity_range = f"B3:H{2+len(terminal_rates)}"
+        rule = ColorScaleRule(start_type='min', start_color='FF6B6B',
+                             mid_type='percentile', mid_value=50, mid_color='FFEB3B',
+                             end_type='max', end_color='4CAF50')
+        ws_sensitivity.conditional_formatting.add(sensitivity_range, rule)
         
         wb.save(output_path)
         print(f"DCF template saved to {output_path}")
