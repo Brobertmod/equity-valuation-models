@@ -1,71 +1,161 @@
 # Equity Valuation Models
 
-A comprehensive toolkit for equity valuation modeling with automated data retrieval and Excel template generation.
+A comprehensive Python toolkit for creating Excel-based equity valuation models with automated data retrieval, sensitivity analysis, and **easy ticker symbol changes directly in Excel**.
+
+## 🚀 Quick Start for Non-Technical Users
+
+### Changing Ticker Symbols in Excel (Recommended)
+
+1. **Download or open any generated Excel file** (e.g., `AAPL_ev_ebitda_model.xlsx`)
+2. **Find the yellow ticker symbol cell** (B2) at the top of the spreadsheet
+3. **Change the symbol** to analyze a new company (e.g., "AAPL" → "MSFT")
+4. **Run the simple script:**
+   - **Windows**: Double-click `generate_models.bat`
+   - **Mac/Linux**: Run `./generate_models.sh` in terminal
+5. **Enter the new ticker symbol** and select model types
+6. **Get your new Excel files** in the output/ folder
+
+📖 **[Complete Excel Usage Guide](EXCEL_USAGE_GUIDE.md)** - Detailed instructions with screenshots
 
 ## Features
 
-- **EV/EBITDA Valuation Model**: Forward-looking enterprise value to EBITDA multiple analysis
-- **EV/Sales Valuation Model**: Enterprise value to sales multiple analysis  
-- **DCF (Discounted Cash Flow) Model**: Intrinsic value calculation with detailed cash flow projections
-- **Sensitivity Analysis**: Test different exit multiples and scenarios
-- **Automated Data Retrieval**: Fetch real-time financial data from multiple sources
-- **Reusable Templates**: Works with any stock symbol
+- **🎯 Excel-Based Symbol Input**: Change ticker symbols directly in Excel templates
+- **📊 Multiple Valuation Models**: EV/EBITDA, EV/Sales, and DCF models with 5-year exit scenarios
+- **🔄 Automated Data Retrieval**: Fetches current financial data from Yahoo Finance and Financial Modeling Prep APIs
+- **📈 Professional Excel Templates**: Embedded formulas, sensitivity analysis, and color-coded results
+- **⚡ Simple Regeneration**: User-friendly batch scripts for non-technical users
+- **🔧 Reusable Framework**: Easily generate models for any publicly traded stock
+
+## Installation
+
+```bash
+git clone https://github.com/Brobertmod/equity-valuation-models.git
+cd equity-valuation-models
+pip install -r requirements.txt
+```
+
+## Usage Options
+
+### Option 1: Excel + Batch Scripts (Recommended for Most Users)
+```bash
+# Windows
+generate_models.bat
+
+# Mac/Linux  
+./generate_models.sh
+```
+
+### Option 2: Command Line (Advanced Users)
+```bash
+# Generate all models for Apple Inc.
+python examples/analyze_stock.py AAPL
+
+# Generate specific models
+python examples/analyze_stock.py MSFT --models ev_ebitda dcf
+```
+
+## Generated Files
+- `AAPL_ev_ebitda_model.xlsx` - EV/EBITDA valuation with 5-year exit scenarios
+- `AAPL_ev_sales_model.xlsx` - EV/Sales valuation with 5-year exit scenarios
+- `AAPL_dcf_model.xlsx` - Discounted Cash Flow model with detailed 5-year projections
+
+## Configuration
+
+### API Keys (Optional)
+
+For enhanced data access, add your API keys to `config/api_keys.yaml`:
+
+```yaml
+fmp_api_key: "your_financial_modeling_prep_key"
+alpha_vantage_key: "your_alpha_vantage_key"
+```
+
+### Supported Data Sources
+- **Yahoo Finance** (Free, no API key required)
+- **Financial Modeling Prep** (Enhanced data with API key)
+- **Alpha Vantage** (Additional metrics with API key)
+
+## Excel Template Features
+
+### 🎯 Ticker Symbol Input
+- **Highlighted yellow cell (B2)** in all templates for easy symbol identification
+- **Clear instructions** for changing symbols and regenerating models
+- **Error handling** for invalid symbols or missing data
+
+### 📊 5-Year Exit Scenarios
+- **EV/EBITDA**: Projects EBITDA growth with multiple exit scenarios
+- **EV/Sales**: Projects revenue growth with multiple exit scenarios  
+- **DCF**: Detailed 5-year cash flow projections with terminal value
+
+### 🔄 Dynamic Formulas
+- All calculations use Excel formulas that update automatically
+- Change assumptions to see immediate impact on valuations
+- Professional sensitivity analysis with color-coded results
 
 ## Project Structure
 
 ```
 equity-valuation-models/
-├── templates/              # Excel template files
-│   ├── ev_ebitda_model.xlsx
-│   ├── ev_sales_model.xlsx
-│   └── dcf_model.xlsx
-├── src/                    # Python source code
-│   ├── data_fetcher.py     # Financial data retrieval
-│   ├── excel_generator.py  # Excel template generation
-│   ├── models/             # Valuation model implementations
-│   └── utils/              # Utility functions
-├── examples/               # Example analyses
-├── config/                 # Configuration files
-└── tests/                  # Unit tests
+├── src/
+│   ├── data_fetcher.py      # Financial data retrieval
+│   ├── excel_generator.py   # Excel template generation
+│   ├── models/              # Valuation model implementations
+│   └── utils/               # Helper utilities
+├── examples/
+│   └── analyze_stock.py     # Main analysis script
+├── config/
+│   └── api_keys.yaml        # API configuration
+├── output/                  # Generated Excel files
+├── generate_models.bat      # Windows batch script
+├── generate_models.sh       # Unix shell script
+├── EXCEL_USAGE_GUIDE.md    # Detailed Excel usage instructions
+└── requirements.txt         # Python dependencies
 ```
 
-## Quick Start
+## Model Details
 
-1. Install dependencies: `pip install -r requirements.txt`
-2. Configure API keys in `config/api_keys.yaml`
-3. Run example: `python examples/analyze_stock.py AAPL`
+### EV/EBITDA Model (5-Year Exit Scenarios)
+- Enterprise Value to EBITDA multiple analysis with growth projections
+- 5-year EBITDA growth assumptions and exit multiple scenarios
+- Annualized return calculations and total return analysis
+- Professional sensitivity analysis with conditional formatting
 
-## Supported Data Sources
+### EV/Sales Model (5-Year Exit Scenarios)
+- Enterprise Value to Sales multiple analysis with revenue growth
+- 5-year revenue projections and exit multiple scenarios
+- Market multiple comparisons and return calculations
+- Color-coded sensitivity tables for different growth/multiple combinations
 
-- Financial Modeling Prep API
-- Alpha Vantage
-- Yahoo Finance
-- Custom subscription sites (configurable)
+### DCF Model (Detailed 5-Year Projections)
+- Comprehensive 5-year cash flow projections
+- Terminal value calculations with growth assumptions
+- WACC-based discounting and equity value derivation
+- Dual-axis sensitivity analysis (WACC vs Terminal Growth)
 
-## Usage Examples
+## Troubleshooting
 
-### EV/EBITDA Analysis
-```python
-from src.models.ev_ebitda import EVEBITDAModel
+### Common Issues
+- **Negative valuations**: Check for negative EBITDA/revenue or unrealistic assumptions
+- **Missing data**: Some companies may have limited financial data available
+- **API timeouts**: Retry the script if data fetching fails
 
-model = EVEBITDAModel("AAPL")
-model.load_data()
-model.calculate_valuation()
-model.sensitivity_analysis(multiple_range=(15, 25))
-model.export_to_excel("AAPL_ev_ebitda.xlsx")
-```
+### Getting Help
+- 📖 Read the [Excel Usage Guide](EXCEL_USAGE_GUIDE.md) for detailed instructions
+- 🔧 Check `examples/analyze_stock.py` for usage examples
+- 📊 Review generated Excel files for formula references
 
-### Sensitivity Analysis
-Test different exit multiples to see impact on stock price:
-- Current multiple: 18.0x
-- Test scenario: 19.5x
-- Calculate implied stock price at exit
+## Contributing
 
-## Requirements
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-model`)
+3. Commit your changes (`git commit -am 'Add new valuation model'`)
+4. Push to the branch (`git push origin feature/new-model`)
+5. Create a Pull Request
 
-- Python 3.8+
-- pandas
-- openpyxl
-- requests
-- xlsxwriter
-- Financial data API access
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Disclaimer
+
+These models are for educational and analysis purposes only. Always conduct thorough due diligence and consult with financial professionals before making investment decisions.
