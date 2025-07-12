@@ -61,53 +61,60 @@ class ExcelTemplateGenerator:
         ws_summary['A11'] = "Current EV/EBITDA:"
         ws_summary['B11'] = key_metrics.get('enterpriseValueMultipleTTM', 0)
         
-        ws_summary['A13'] = "Valuation Analysis"
+        ws_summary['A13'] = "Model Inputs"
         ws_summary['A13'].font = self.header_font
         ws_summary['A13'].fill = self.header_fill
-        ws_summary.merge_cells('A13:F13')
-        
-        headers = ['Scenario', 'EV/EBITDA Multiple', 'Target EV', 'Target Equity Value', 'Target Price', 'Upside/Downside']
-        for i, header in enumerate(headers, 1):
-            cell = ws_summary.cell(row=14, column=i, value=header)
-            cell.font = self.header_font
-            cell.fill = self.header_fill
-            cell.border = self.border
-            cell.alignment = self.center_alignment
+        ws_summary.merge_cells('A13:B13')
         
         financial_statements = data.get('financial_statements', {})
         income_statement = financial_statements.get('income_statement', [])
         ebitda = 0
         if income_statement:
             latest = income_statement[0]
-            ebitda = latest.get('ebitda', 0) or latest.get('operatingIncome', 0)
+            ebitda = latest.get('EBITDA', 0) or latest.get('ebitda', 0) or latest.get('operatingIncome', 0) or latest.get('Operating Income', 0)
+        
+        shares_outstanding = ev_data.get('marketCapitalization', 0) / profile.get('price', 1) if profile.get('price', 0) > 0 else 0
+        net_debt = ev_data.get('totalDebt', 0) - ev_data.get('cashAndCashEquivalents', 0)
+        current_price = profile.get('price', 0)
+        
+        ws_summary['A14'] = "EBITDA (TTM):"
+        ws_summary['B14'] = ebitda
+        ws_summary['A15'] = "Net Debt:"
+        ws_summary['B15'] = net_debt
+        ws_summary['A16'] = "Shares Outstanding:"
+        ws_summary['B16'] = shares_outstanding
+        ws_summary['A17'] = "Current Price:"
+        ws_summary['B17'] = current_price
+        
+        ws_summary['A19'] = "Valuation Analysis"
+        ws_summary['A19'].font = self.header_font
+        ws_summary['A19'].fill = self.header_fill
+        ws_summary.merge_cells('A19:F19')
+        
+        headers = ['Scenario', 'EV/EBITDA Multiple', 'Target EV', 'Target Equity Value', 'Target Price', 'Upside/Downside']
+        for i, header in enumerate(headers, 1):
+            cell = ws_summary.cell(row=20, column=i, value=header)
+            cell.font = self.header_font
+            cell.fill = self.header_fill
+            cell.border = self.border
+            cell.alignment = self.center_alignment
         
         scenarios = [
             ('Bear Case', 15.0),
             ('Base Case', 18.0),
             ('Bull Case', 22.0),
             ('Current Multiple', key_metrics.get('enterpriseValueMultipleTTM', 18.0)),
-            ('Test Scenario', 19.5)  # User's example scenario
+            ('Test Scenario', 19.5)
         ]
         
-        shares_outstanding = ev_data.get('marketCapitalization', 0) / profile.get('price', 1) if profile.get('price', 0) > 0 else 0
-        net_debt = ev_data.get('totalDebt', 0) - ev_data.get('cashAndCashEquivalents', 0)
-        current_price = profile.get('price', 0)
-        
-        for i, (scenario, multiple) in enumerate(scenarios, 15):
+        for i, (scenario, multiple) in enumerate(scenarios, 21):
             ws_summary.cell(row=i, column=1, value=scenario)
             ws_summary.cell(row=i, column=2, value=multiple)
             
-            target_ev = ebitda * multiple
-            ws_summary.cell(row=i, column=3, value=target_ev)
-            
-            target_equity = target_ev - net_debt
-            ws_summary.cell(row=i, column=4, value=target_equity)
-            
-            target_price = target_equity / shares_outstanding if shares_outstanding > 0 else 0
-            ws_summary.cell(row=i, column=5, value=target_price)
-            
-            upside = (target_price - current_price) / current_price if current_price > 0 else 0
-            ws_summary.cell(row=i, column=6, value=upside)
+            ws_summary.cell(row=i, column=3, value=f'=$B$14*B{i}')
+            ws_summary.cell(row=i, column=4, value=f'=C{i}-$B$15')
+            ws_summary.cell(row=i, column=5, value=f'=D{i}/$B$16')
+            ws_summary.cell(row=i, column=6, value=f'=(E{i}-$B$17)/$B$17')
             ws_summary.cell(row=i, column=6).number_format = '0.0%'
         
         ws_sensitivity = wb.create_sheet("Sensitivity Analysis")
@@ -131,12 +138,10 @@ class ExcelTemplateGenerator:
             ws_sensitivity.cell(row=i, column=1).fill = self.header_fill
             
             for j, multiple in enumerate(multiples, 2):
-                adjusted_ebitda = ebitda * (1 + growth/100)
-                target_ev = adjusted_ebitda * multiple
-                target_equity = target_ev - net_debt
-                target_price = target_equity / shares_outstanding if shares_outstanding > 0 else 0
-                
-                ws_sensitivity.cell(row=i, column=j, value=target_price)
+                col_letter = chr(ord('A') + j)
+                growth_decimal = growth / 100
+                formula = f'=(Summary.$B$14*(1+{growth_decimal})*{multiple}-Summary.$B$15)/Summary.$B$16'
+                ws_sensitivity.cell(row=i, column=j, value=formula)
                 ws_sensitivity.cell(row=i, column=j).number_format = '$0.00'
         
         sensitivity_range = f"B3:L{2+len(ebitda_growth_rates)}"
@@ -197,7 +202,25 @@ class ExcelTemplateGenerator:
         revenue = 0
         if income_statement:
             latest = income_statement[0]
-            revenue = latest.get('revenue', 0) or latest.get('totalRevenue', 0)
+            revenue = latest.get('Total Revenue', 0) or latest.get('revenue', 0) or latest.get('totalRevenue', 0)
+        
+        shares_outstanding = ev_data.get('marketCapitalization', 0) / profile.get('price', 1) if profile.get('price', 0) > 0 else 0
+        net_debt = ev_data.get('totalDebt', 0) - ev_data.get('cashAndCashEquivalents', 0)
+        current_price = profile.get('price', 0)
+        
+        ws['A3'] = "Model Inputs"
+        ws['A3'].font = self.header_font
+        ws['A3'].fill = self.header_fill
+        ws.merge_cells('A3:B3')
+        
+        ws['A4'] = "Revenue (TTM):"
+        ws['B4'] = revenue
+        ws['A5'] = "Net Debt:"
+        ws['B5'] = net_debt
+        ws['A6'] = "Shares Outstanding:"
+        ws['B6'] = shares_outstanding
+        ws['A7'] = "Current Price:"
+        ws['B7'] = current_price
         
         scenarios = [
             ('Conservative', 2.0),
@@ -207,31 +230,25 @@ class ExcelTemplateGenerator:
             ('Target Multiple', 4.2)
         ]
         
+        ws['A9'] = "Valuation Analysis"
+        ws['A9'].font = self.header_font
+        ws['A9'].fill = self.header_fill
+        ws.merge_cells('A9:F9')
+        
         headers = ['Scenario', 'EV/Sales Multiple', 'Target EV', 'Target Equity Value', 'Target Price', 'Upside/Downside']
         for i, header in enumerate(headers, 1):
-            cell = ws.cell(row=5, column=i, value=header)
+            cell = ws.cell(row=10, column=i, value=header)
             cell.font = self.header_font
             cell.fill = self.header_fill
         
-        shares_outstanding = ev_data.get('marketCapitalization', 0) / profile.get('price', 1) if profile.get('price', 0) > 0 else 0
-        net_debt = ev_data.get('totalDebt', 0) - ev_data.get('cashAndCashEquivalents', 0)
-        current_price = profile.get('price', 0)
-        
-        for i, (scenario, multiple) in enumerate(scenarios, 6):
+        for i, (scenario, multiple) in enumerate(scenarios, 11):
             ws.cell(row=i, column=1, value=scenario)
             ws.cell(row=i, column=2, value=multiple)
             
-            target_ev = revenue * multiple
-            ws.cell(row=i, column=3, value=target_ev)
-            
-            target_equity = target_ev - net_debt
-            ws.cell(row=i, column=4, value=target_equity)
-            
-            target_price = target_equity / shares_outstanding if shares_outstanding > 0 else 0
-            ws.cell(row=i, column=5, value=target_price)
-            
-            upside = (target_price - current_price) / current_price if current_price > 0 else 0
-            ws.cell(row=i, column=6, value=upside)
+            ws.cell(row=i, column=3, value=f'=$B$4*B{i}')
+            ws.cell(row=i, column=4, value=f'=C{i}-$B$5')
+            ws.cell(row=i, column=5, value=f'=D{i}/$B$6')
+            ws.cell(row=i, column=6, value=f'=(E{i}-$B$7)/$B$7')
             ws.cell(row=i, column=6).number_format = '0.0%'
         
         wb.save(output_path)
@@ -318,10 +335,10 @@ class ExcelTemplateGenerator:
         ws_dcf['A22'].fill = self.header_fill
         
         ws_dcf['A23'] = "Terminal Value"
-        ws_dcf['B23'] = '=H20/(B$5-B$6)'  # Terminal FCF / (Terminal Growth - WACC)
+        ws_dcf['B23'] = '=H20/($B$5-$B$6)'
         
         ws_dcf['A24'] = "PV of Terminal Value"
-        ws_dcf['B24'] = '=B23/((1+$B$6)^5)'  # Discount terminal value
+        ws_dcf['B24'] = '=B23/((1+$B$6)^5)'
         
         ws_dcf['A25'] = "Sum of PV of FCF (Years 1-5)"
         ws_dcf['B25'] = '=NPV($B$6,C20:G20)'  # NPV of explicit forecast period

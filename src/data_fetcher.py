@@ -83,9 +83,22 @@ class FinancialDataFetcher:
             
             if not statements:
                 ticker = yf.Ticker(symbol)
-                statements['income_statement'] = ticker.financials.to_dict('records')
-                statements['balance_sheet'] = ticker.balance_sheet.to_dict('records')
-                statements['cash_flow'] = ticker.cashflow.to_dict('records')
+                
+                financials = ticker.financials
+                balance_sheet = ticker.balance_sheet
+                cashflow = ticker.cashflow
+                
+                if not financials.empty:
+                    financials_transposed = financials.T  # Transpose so dates are rows
+                    statements['income_statement'] = financials_transposed.to_dict('records')
+                
+                if not balance_sheet.empty:
+                    balance_sheet_transposed = balance_sheet.T
+                    statements['balance_sheet'] = balance_sheet_transposed.to_dict('records')
+                
+                if not cashflow.empty:
+                    cashflow_transposed = cashflow.T
+                    statements['cash_flow'] = cashflow_transposed.to_dict('records')
                 
         except Exception as e:
             print(f"Error fetching financial statements for {symbol}: {e}")
