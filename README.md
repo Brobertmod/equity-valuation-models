@@ -135,14 +135,22 @@ equity-valuation-models/
 ## Troubleshooting
 
 ### Common Issues
+- **"Script says success but I see old data"**: You're likely looking at the old file instead of the new one. The scripts create NEW files with the new symbol name (e.g., `MSFT_ev_sales_model.xlsx`), they don't update existing files.
 - **Negative valuations**: Check for negative EBITDA/revenue or unrealistic assumptions
 - **Missing data**: Some companies may have limited financial data available
 - **API timeouts**: Retry the script if data fetching fails
+
+### File Creation vs File Updating
+**Important:** When you change a ticker symbol and run the scripts:
+- ✅ **NEW files are created** with the new symbol name
+- ❌ **Existing files are NOT updated**
+- 📁 **Look in the output/ folder** for files starting with your new symbol
 
 ### Getting Help
 - 📖 Read the [Excel Usage Guide](EXCEL_USAGE_GUIDE.md) for detailed instructions
 - 🔧 Check `examples/analyze_stock.py` for usage examples
 - 📊 Review generated Excel files for formula references
+- 🔍 Run `python verify_setup.py` to test your installation
 
 ## Contributing
 

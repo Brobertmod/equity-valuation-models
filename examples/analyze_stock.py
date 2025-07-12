@@ -51,6 +51,13 @@ def main():
     
     print(f"\nValuation models generated for {args.symbol}")
     print(f"Files saved to: {args.output_dir}/")
+    print(f"\nNew files created:")
+    for model in models_to_generate:
+        output_path = os.path.join(args.output_dir, f"{args.symbol}_{model}_model.xlsx")
+        if os.path.exists(output_path):
+            stat = os.stat(output_path)
+            size_kb = stat.st_size / 1024
+            print(f"  - {os.path.basename(output_path)} ({size_kb:.1f} KB)")
     
     profile = data.get('profile', {})
     key_metrics = data.get('key_metrics', {})

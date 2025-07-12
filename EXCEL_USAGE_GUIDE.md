@@ -73,6 +73,29 @@ python examples/analyze_stock.py GOOGL --models ev_sales dcf
   - WACC-based discounting
   - Sensitivity analysis for WACC and terminal growth rates
 
+## Important: Understanding File Creation
+
+**Key Point:** The scripts create NEW files with the new symbol name. They do NOT update your existing Excel files.
+
+### Example Workflow:
+1. You have: `AAPL_ev_sales_model.xlsx` (Apple data)
+2. You change the symbol in Excel to "MSFT" 
+3. You run the script and enter "MSFT"
+4. **Result:** New file created: `MSFT_ev_sales_model.xlsx` (Microsoft data)
+5. **Your original AAPL file remains unchanged**
+
+### Finding Your New Files:
+- Look in the `output/` folder
+- New files start with your new symbol (e.g., `MSFT_`, `TSLA_`, etc.)
+- Check the file timestamps - newest files are your generated models
+- File sizes may differ between companies due to different data availability
+
+### Troubleshooting "Old Data" Issues:
+- **Problem:** "I see old symbol data after running the script"
+- **Solution:** Make sure you're opening the NEW file with the new symbol name
+- **Check:** Look for `[NEW_SYMBOL]_ev_sales_model.xlsx` in the output folder
+- **Verify:** The script output shows which files were created
+
 ## Troubleshooting
 
 ### Common Issues
@@ -90,6 +113,11 @@ python examples/analyze_stock.py GOOGL --models ev_sales dcf
    - Some companies may have limited financial data available
    - Try using a different data source or manual input
    - Check if the company reports in a different currency
+
+4. **"Script says success but I see old data"**
+   - You're likely looking at the old file instead of the new one
+   - Check for files with the NEW symbol name in the output folder
+   - The script creates new files, it doesn't update existing ones
 
 ### Getting Help
 - Review the README.md file for technical setup instructions

@@ -12,6 +12,15 @@ echo 3. EV/Sales only
 echo 4. DCF only
 set /p choice="Enter choice (1-4): "
 echo.
+set /p cleanup="Remove old files for other symbols? (y/N): "
+if /i "%cleanup%"=="y" (
+    echo Cleaning up old files...
+    for %%f in (output\*.xlsx) do (
+        echo %%f | findstr /v "%symbol%_" >nul && del "%%f" 2>nul
+    )
+    echo Old files removed.
+)
+echo.
 echo Generating models for %symbol%...
 
 if "%choice%"=="1" (
@@ -30,6 +39,8 @@ if "%choice%"=="1" (
 echo.
 echo ==========================================
 echo Models generated successfully!
-echo Check the output/ folder for Excel files.
+echo New files created in output/ folder:
+dir output\%symbol%_*.xlsx 2>nul || echo No files found for %symbol%
 echo ==========================================
+echo Look for files starting with: %symbol%_
 pause
