@@ -3,6 +3,10 @@ fmp_api_key: "YOUR_FMP_API_KEY_HERE"
 
 alpha_vantage_key: "YOUR_ALPHA_VANTAGE_KEY_HERE"
 
+finbox:
+  user_id: "YOUR_FINBOX_USER_ID_HERE"
+  password: "YOUR_FINBOX_PASSWORD_HERE"
+
 custom_sites:
   bloomberg_terminal:
     username: ""

@@ -157,3 +157,35 @@ Here's how to enhance a Python-generated EV/EBITDA model with Excel add-in funct
 5. **Create peer comparison**: Add columns for `=FMPRatios("MSFT")`, etc.
 
 This combination provides both comprehensive historical analysis (Python) and real-time market data (Excel add-in).
+
+## Available Excel Add-ins
+
+### 1. Financial Modeling Prep (FMP) Excel Add-in
+- **Purpose**: Real-time financial data directly in Excel
+- **API Key**: Already configured in your project
+- **Installation**: Available through Microsoft AppSource
+
+### 2. FINBOX Integration
+- **Purpose**: Advanced financial modeling and valuation data
+- **Credentials**: Configured in your project (USER ID: Robert.hollmann7@gmail.com)
+- **Note**: FINBOX may not have a direct Excel add-in, but credentials are stored for potential API integration
+
+## Testing Your Setup
+
+Once you've installed the FMP add-in:
+
+1. **Test basic functionality**:
+   ```excel
+   =FMPPrice("AAPL")
+   =FMPCompanyProfile("AAPL")
+   ```
+
+2. **Test with your models**:
+   - Open any generated Excel model
+   - Try using FMP functions alongside the existing formulas
+   - Verify real-time data updates work correctly
+
+3. **FINBOX Integration**:
+   - FINBOX credentials are stored securely in your project configuration
+   - If FINBOX provides Excel add-in or API documentation, you can integrate it using the stored credentials
+   - Contact FINBOX support for Excel integration options
