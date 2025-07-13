@@ -61,9 +61,9 @@ python examples/analyze_stock.py MSFT --models ev_ebitda dcf
 
 ## Configuration
 
-### API Keys (Optional)
+### API Keys (Enhanced Data Access)
 
-For enhanced data access, add your API keys to `config/api_keys.yaml`:
+Premium API keys are configured in `config/api_keys.yaml` for enhanced data access:
 
 ```yaml
 fmp_api_key: "your_financial_modeling_prep_key"
@@ -72,8 +72,20 @@ alpha_vantage_key: "your_alpha_vantage_key"
 
 ### Supported Data Sources
 - **Yahoo Finance** (Free, no API key required)
-- **Financial Modeling Prep** (Enhanced data with API key)
-- **Alpha Vantage** (Additional metrics with API key)
+- **Financial Modeling Prep** (Enhanced data with premium API key) ✅ Configured
+- **Alpha Vantage** (Additional metrics with premium API key) ✅ Configured
+
+### Excel Add-in Integration
+
+For real-time data access directly in Excel, install the Financial Modeling Prep Excel add-in:
+
+📖 **[Excel Add-in Setup Guide](EXCEL_ADDON_SETUP_GUIDE.md)** - Complete installation and usage instructions
+
+**Key Benefits:**
+- Real-time price updates in Excel
+- Dynamic financial data functions
+- Peer comparison capabilities
+- Complements Python-generated models
 
 ## Excel Template Features
 

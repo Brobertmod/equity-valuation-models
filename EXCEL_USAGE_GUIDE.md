@@ -96,6 +96,20 @@ python examples/analyze_stock.py GOOGL --models ev_sales dcf
 - **Check:** Look for `[NEW_SYMBOL]_ev_sales_model.xlsx` in the output folder
 - **Verify:** The script output shows which files were created
 
+## Excel Add-in Integration
+
+For enhanced functionality, you can install the Financial Modeling Prep Excel add-in to get real-time data directly in Excel:
+
+📖 **[Excel Add-in Setup Guide](EXCEL_ADDON_SETUP_GUIDE.md)** - Complete installation instructions
+
+**Workflow with Excel Add-in:**
+1. **Generate base models** using Python scripts (comprehensive historical data)
+2. **Install FMP Excel add-in** for real-time data access
+3. **Enhance models** with dynamic functions like `=FMPPrice("AAPL")`
+4. **Get real-time updates** without regenerating entire models
+
+This hybrid approach gives you both comprehensive analysis and real-time market data.
+
 ## Troubleshooting
 
 ### Common Issues

@@ -1,0 +1,28 @@
+# Environment variables and secrets
+.env
+config/api_keys.yaml
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Output files (optional - user may want to track these)
+# output/*.xlsx
+
+# Debug files
+debug_output/
+debug_*.py

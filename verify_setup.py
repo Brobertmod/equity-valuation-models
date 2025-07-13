@@ -30,7 +30,30 @@ def verify_setup():
         print("   ✗ Output directory missing")
         return False
     
-    print("3. Testing file generation...")
+    print("3. Testing enhanced API features...")
+    try:
+        comprehensive_data = fetcher.get_comprehensive_data("AAPL")
+        
+        if comprehensive_data.get('analyst_data', {}).get('estimates'):
+            print("   ✓ Analyst estimates available (premium feature)")
+        else:
+            print("   ⚠ Analyst estimates not available (may require premium subscription)")
+            
+        if comprehensive_data.get('analyst_data', {}).get('price_targets'):
+            print("   ✓ Price targets available (premium feature)")
+        else:
+            print("   ⚠ Price targets not available (may require premium subscription)")
+            
+        key_metrics = comprehensive_data.get('key_metrics', {})
+        if key_metrics.get('enterpriseValueMultipleTTM'):
+            print("   ✓ Enhanced key metrics available")
+        else:
+            print("   ⚠ Limited key metrics data")
+            
+    except Exception as e:
+        print(f"   ✗ Enhanced API features test failed: {e}")
+    
+    print("4. Testing file generation...")
     from src.excel_generator import ExcelTemplateGenerator
     generator = ExcelTemplateGenerator()
     
@@ -49,6 +72,15 @@ def verify_setup():
     
     print()
     print("✓ Setup verification complete - system is working correctly")
+    print()
+    print("API Configuration Status:")
+    print(f"  - FMP API Key: {'✓ Configured' if fetcher.fmp_api_key else '✗ Missing'}")
+    print(f"  - Alpha Vantage API Key: {'✓ Configured' if fetcher.alpha_vantage_key else '✗ Missing'}")
+    print()
+    print("Next Steps:")
+    print("1. Install FMP Excel add-in: See EXCEL_ADDON_SETUP_GUIDE.md")
+    print("2. Generate models: python examples/analyze_stock.py AAPL")
+    print("3. Test enhanced data quality with different symbols")
     print()
     print("If you're still having issues:")
     print("1. Make sure you're looking for files with the NEW symbol name")
